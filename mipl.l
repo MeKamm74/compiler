@@ -1,7 +1,6 @@
-/*    example.l
- 
-Example of a lex specification file.
-     
+/*    mipl.l
+      Author: Michael Kammeyer
+
       To create the lexical analyzer:
 
       flex mipl.l
@@ -16,12 +15,9 @@ Definitions of constants, variables, & function prototypes go here
 
 #include <string.h>
 
-int numLines = 0;
-
-void printTokenInfo(const char* tokenType, char* lexeme);
-
 %}
 
+%option yylineno
 /* Defintions of regular expressions go here */
 
 DIGIT [0-9]
@@ -48,8 +44,11 @@ ID {LETTER}({LETTER}|{DIGIT})*
         ++i;
 
     int length = strlen(yytext) - i;
-    if(length < 10)
+    if(length < 10) {
         printTokenInfo("T_INTCONST", yytext);
+        return T_INTCONST;
+    }
+
     else if(length > 10)
         printf("**** Invalid integer constant: %s\n", yytext);
     else {
@@ -63,35 +62,37 @@ ID {LETTER}({LETTER}|{DIGIT})*
         
         if(flag == true)
             printf("**** Invalid integer constant: %s\n", yytext);
-        else
+        else {
             printTokenInfo("T_INTCONST", yytext);
+            return T_INTCONST;
+        }
     }
     return 1;
 }
 
 {CHAR} {
     printTokenInfo("T_CHARCONST", yytext);
-    return 1;
+    return T_CHARCONST;
 }
 
 \+ {
     printTokenInfo("T_PLUS", yytext);
-    return 1;
+    return T_PLUS;
 }
 
 \- {
     printTokenInfo("T_MINUS", yytext);
-    return 1;
+    return T_MINUS;
 }
 
 ":=" {
     printTokenInfo("T_ASSIGN", yytext);
-    return 1;
+    return T_ASSIGN;
 }
 
 \* {
     printTokenInfo("T_MULT", yytext);
-    return 1;
+    return T_MULT;
 }
 
 [ \t\r]+ {
@@ -104,197 +105,197 @@ ID {LETTER}({LETTER}|{DIGIT})*
 
 "div" {
     printTokenInfo("T_DIV", yytext);
-    return 1;
+    return T_DIV;
 }
 
 "if" {
     printTokenInfo("T_IF", yytext);
-    return 1;
+    return T_IF;
 }
 
 "else" {
     printTokenInfo("T_ELSE", yytext);
-    return 1;
+    return T_ELSE;
 }
 
 "begin" {
     printTokenInfo("T_BEGIN", yytext);
-    return 1;
+    return T_BEGIN;
 }
 
 "end" {
     printTokenInfo("T_END", yytext);
-    return 1;
+    return T_END;
 }
 
 "integer" {
     printTokenInfo("T_INT", yytext);
-    return 1;
+    return T_INT;
 }
 
 "char" {
     printTokenInfo("T_CHAR", yytext);
-    return 1;
+    return T_CHAR;
 }
 
 "boolean" {
     printTokenInfo("T_BOOL", yytext);
-    return 1;
+    return T_BOOL;
 }
 
 "and" {
     printTokenInfo("T_AND", yytext);
-    return 1;
+    return T_AND;
 }
 
 "or" {
     printTokenInfo("T_OR", yytext);
-    return 1;
+    return T_OR;
 }
 
 "true" {
     printTokenInfo("T_TRUE", yytext);
-    return 1;
+    return T_TRUE;
 }
 
 "false" {
     printTokenInfo("T_FALSE", yytext);
-    return 1;
+    return T_FALSE;
 }
 
 "var" {
     printTokenInfo("T_VAR", yytext);
-    return 1;
+    return T_VAR;
 }
 
 "then" {
     printTokenInfo("T_THEN", yytext);
-    return 1;
+    return T_THEN;
 }
 
 "do" {
     printTokenInfo("T_DO", yytext);
-    return 1;
+    return T_DO;
 }
 
 "while" {
     printTokenInfo("T_WHILE", yytext);
-    return 1;
+    return T_WHILE;
 }
 
 "not" {
     printTokenInfo("T_NOT", yytext);
-    return 1;
+    return T_NOT;
 }
 
 "of" {
     printTokenInfo("T_OF", yytext);
-    return 1;
+    return T_OF;
 }
 
 "procedure" {
     printTokenInfo("T_PROC", yytext);
-    return 1;
+    return T_PROC;
 }
 
 "program" {
     printTokenInfo("T_PROG", yytext);
-    return 1;
+    return T_PROG;
 }
 
 "write" {
     printTokenInfo("T_WRITE", yytext);
-    return 1;
+    return T_WRITE;
 }
 
 "read" {
     printTokenInfo("T_READ", yytext);
-    return 1;
+    return T_READ;
 }
 
 "array" {
     printTokenInfo("T_ARRAY", yytext);
-    return 1;
+    return T_ARRAY;
 }
 
 "(" {
     printTokenInfo("T_LPAREN", yytext);
-    return 1;
+    return T_LPAREN;
 }
 
 ")" {
     printTokenInfo("T_RPAREN", yytext);
-    return 1;
+    return T_RPAREN;
 }
 
 "[" {
     printTokenInfo("T_LBRACK", yytext);
-    return 1;
+    return T_LBRACK;
 }
 
 "]" {
     printTokenInfo("T_RBRACK", yytext);
-    return 1;
+    return T_RBRACK;
 }
 
 "," {
     printTokenInfo("T_COMMA", yytext);
-    return 1;
+    return T_COMMA;
 }
 
 ";" {
     printTokenInfo("T_SCOLON", yytext);
-    return 1;
+    return T_SCOLON;
 }
 
 ":" {
     printTokenInfo("T_COLON", yytext);
-    return 1;
+    return T_COLON;
 }
 
 "<" {
     printTokenInfo("T_LT", yytext);
-    return 1;
+    return T_LT;
 }
 
 ">" {
     printTokenInfo("T_GT", yytext);
-    return 1;
+    return T_GT;
 }
 
 "<>" {
     printTokenInfo("T_NE", yytext);
-    return 1;
+    return T_NE;
 }
 
 "<=" {
     printTokenInfo("T_LE", yytext);
-    return 1;
+    return T_LE;
 }
 
 ">=" {
     printTokenInfo("T_GE", yytext);
-    return 1;
+    return T_GE;
 }
 
 "=" {
     printTokenInfo("T_EQ", yytext);
-    return 1;
+    return T_EQ;
 }
 
 "." {
     printTokenInfo("T_DOT", yytext);
-    return 1;
+    return T_DOT;
 }
 
 ".." {
     printTokenInfo("T_DOTDOT", yytext);
-    return 1;
+    return T_DOTDOT;
 }
 
 {ID} {
     printTokenInfo("T_IDENT", yytext);
-    return 1;
+    return T_IDENT;
 }
 
 '' {
@@ -313,21 +314,4 @@ ID {LETTER}({LETTER}|{DIGIT})*
 }
 
 %%
-
-// User-written code goes here
-
-void printTokenInfo(const char* tokenType, char* lexeme) {
-    printf("TOKEN: %s  LEXEME: %s\n", tokenType, lexeme);
-}
-
-// You should supply a yywrap function.
-// Having it return 1 means only 1 input file will be scanned.
-int yywrap(void) { return 1; }
-
-int main(void) {
-    while ( yylex() ) ;  // Keep processing tokens until 0 returned
-
-    //printf("Processed %d lines\n", numLines);
-    return 0;
-}
 

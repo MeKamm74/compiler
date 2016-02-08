@@ -169,7 +169,20 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
 
-    #define YY_LESS_LINENO(n)
+    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
+     *       access to the local variable yy_act. Since yyless() is a macro, it would break
+     *       existing scanners that call yyless() from OUTSIDE yylex. 
+     *       One obvious solution it to make yy_act a global. I tried that, and saw
+     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
+     *       normally declared as a register variable-- so it is not worth it.
+     */
+    #define  YY_LESS_LINENO(n) \
+            do { \
+                int yyl;\
+                for ( yyl = n; yyl < yyleng; ++yyl )\
+                    if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -528,6 +541,13 @@ static yyconst flex_int16_t yy_chk[205] =
       129,  129,  129,  129
     } ;
 
+/* Table of booleans, true if rule could match eol. */
+static yyconst flex_int32_t yy_rule_can_match_eol[53] =
+    {   0,
+1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
 
@@ -543,29 +563,24 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "mipl.l"
-/*    example.l
- 
-Example of a lex specification file.
-     
+/*    mipl.l
+      Author: Michael Kammeyer
+
       To create the lexical analyzer:
 
       flex mipl.l
       g++ lex.yy.c -o lexer
       lexer < inputFileName
 */
-#line 13 "mipl.l"
+#line 12 "mipl.l"
 /* 
 Definitions of constants, variables, & function prototypes go here 
 */
 
 #include <string.h>
 
-int numLines = 0;
-
-void printTokenInfo(const char* tokenType, char* lexeme);
-
 /* Defintions of regular expressions go here */
-#line 569 "lex.yy.c"
+#line 584 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -752,9 +767,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 32 "mipl.l"
+#line 28 "mipl.l"
 
-#line 758 "lex.yy.c"
+#line 773 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -826,6 +841,16 @@ yy_find_action:
 
 		YY_DO_BEFORE_ACTION;
 
+		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
+			{
+			int yyl;
+			for ( yyl = 0; yyl < yyleng; ++yyl )
+				if ( yytext[yyl] == '\n' )
+					   
+    yylineno++;
+;
+			}
+
 do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
@@ -840,14 +865,14 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 33 "mipl.l"
+#line 29 "mipl.l"
 {
 
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 37 "mipl.l"
+#line 33 "mipl.l"
 {
     int i = 0;
     if(yytext[0] == '-') {
@@ -862,8 +887,11 @@ YY_RULE_SETUP
         ++i;
 
     int length = strlen(yytext) - i;
-    if(length < 10)
+    if(length < 10) {
         printTokenInfo("T_INTCONST", yytext);
+        return T_INTCONST;
+    }
+
     else if(length > 10)
         printf("**** Invalid integer constant: %s\n", yytext);
     else {
@@ -877,55 +905,57 @@ YY_RULE_SETUP
         
         if(flag == true)
             printf("**** Invalid integer constant: %s\n", yytext);
-        else
+        else {
             printTokenInfo("T_INTCONST", yytext);
+            return T_INTCONST;
+        }
     }
     return 1;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 72 "mipl.l"
+#line 73 "mipl.l"
 {
     printTokenInfo("T_CHARCONST", yytext);
-    return 1;
+    return T_CHARCONST;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 77 "mipl.l"
+#line 78 "mipl.l"
 {
     printTokenInfo("T_PLUS", yytext);
-    return 1;
+    return T_PLUS;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 82 "mipl.l"
+#line 83 "mipl.l"
 {
     printTokenInfo("T_MINUS", yytext);
-    return 1;
+    return T_MINUS;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 87 "mipl.l"
+#line 88 "mipl.l"
 {
     printTokenInfo("T_ASSIGN", yytext);
-    return 1;
+    return T_ASSIGN;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 92 "mipl.l"
+#line 93 "mipl.l"
 {
     printTokenInfo("T_MULT", yytext);
-    return 1;
+    return T_MULT;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 97 "mipl.l"
+#line 98 "mipl.l"
 {
 
 }
@@ -933,326 +963,326 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 101 "mipl.l"
+#line 102 "mipl.l"
 {
     numLines++;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 105 "mipl.l"
+#line 106 "mipl.l"
 {
     printTokenInfo("T_DIV", yytext);
-    return 1;
+    return T_DIV;
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 110 "mipl.l"
+#line 111 "mipl.l"
 {
     printTokenInfo("T_IF", yytext);
-    return 1;
+    return T_IF;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 115 "mipl.l"
+#line 116 "mipl.l"
 {
     printTokenInfo("T_ELSE", yytext);
-    return 1;
+    return T_ELSE;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 120 "mipl.l"
+#line 121 "mipl.l"
 {
     printTokenInfo("T_BEGIN", yytext);
-    return 1;
+    return T_BEGIN;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 125 "mipl.l"
+#line 126 "mipl.l"
 {
     printTokenInfo("T_END", yytext);
-    return 1;
+    return T_END;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 130 "mipl.l"
+#line 131 "mipl.l"
 {
     printTokenInfo("T_INT", yytext);
-    return 1;
+    return T_INT;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 135 "mipl.l"
+#line 136 "mipl.l"
 {
     printTokenInfo("T_CHAR", yytext);
-    return 1;
+    return T_CHAR;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 140 "mipl.l"
+#line 141 "mipl.l"
 {
     printTokenInfo("T_BOOL", yytext);
-    return 1;
+    return T_BOOL;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 145 "mipl.l"
+#line 146 "mipl.l"
 {
     printTokenInfo("T_AND", yytext);
-    return 1;
+    return T_AND;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 150 "mipl.l"
+#line 151 "mipl.l"
 {
     printTokenInfo("T_OR", yytext);
-    return 1;
+    return T_OR;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 155 "mipl.l"
+#line 156 "mipl.l"
 {
     printTokenInfo("T_TRUE", yytext);
-    return 1;
+    return T_TRUE;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 160 "mipl.l"
+#line 161 "mipl.l"
 {
     printTokenInfo("T_FALSE", yytext);
-    return 1;
+    return T_FALSE;
 }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 165 "mipl.l"
+#line 166 "mipl.l"
 {
     printTokenInfo("T_VAR", yytext);
-    return 1;
+    return T_VAR;
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 170 "mipl.l"
+#line 171 "mipl.l"
 {
     printTokenInfo("T_THEN", yytext);
-    return 1;
+    return T_THEN;
 }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 175 "mipl.l"
+#line 176 "mipl.l"
 {
     printTokenInfo("T_DO", yytext);
-    return 1;
+    return T_DO;
 }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 180 "mipl.l"
+#line 181 "mipl.l"
 {
     printTokenInfo("T_WHILE", yytext);
-    return 1;
+    return T_WHILE;
 }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 185 "mipl.l"
+#line 186 "mipl.l"
 {
     printTokenInfo("T_NOT", yytext);
-    return 1;
+    return T_NOT;
 }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 190 "mipl.l"
+#line 191 "mipl.l"
 {
     printTokenInfo("T_OF", yytext);
-    return 1;
+    return T_OF;
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 195 "mipl.l"
+#line 196 "mipl.l"
 {
     printTokenInfo("T_PROC", yytext);
-    return 1;
+    return T_PROC;
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 200 "mipl.l"
+#line 201 "mipl.l"
 {
     printTokenInfo("T_PROG", yytext);
-    return 1;
+    return T_PROG;
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 205 "mipl.l"
+#line 206 "mipl.l"
 {
     printTokenInfo("T_WRITE", yytext);
-    return 1;
+    return T_WRITE;
 }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 210 "mipl.l"
+#line 211 "mipl.l"
 {
     printTokenInfo("T_READ", yytext);
-    return 1;
+    return T_READ;
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 215 "mipl.l"
+#line 216 "mipl.l"
 {
     printTokenInfo("T_ARRAY", yytext);
-    return 1;
+    return T_ARRAY;
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 220 "mipl.l"
+#line 221 "mipl.l"
 {
     printTokenInfo("T_LPAREN", yytext);
-    return 1;
+    return T_LPAREN;
 }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 225 "mipl.l"
+#line 226 "mipl.l"
 {
     printTokenInfo("T_RPAREN", yytext);
-    return 1;
+    return T_RPAREN;
 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 230 "mipl.l"
+#line 231 "mipl.l"
 {
     printTokenInfo("T_LBRACK", yytext);
-    return 1;
+    return T_LBRACK;
 }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 235 "mipl.l"
+#line 236 "mipl.l"
 {
     printTokenInfo("T_RBRACK", yytext);
-    return 1;
+    return T_RBRACK;
 }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 240 "mipl.l"
+#line 241 "mipl.l"
 {
     printTokenInfo("T_COMMA", yytext);
-    return 1;
+    return T_COMMA;
 }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 245 "mipl.l"
+#line 246 "mipl.l"
 {
     printTokenInfo("T_SCOLON", yytext);
-    return 1;
+    return T_SCOLON;
 }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 250 "mipl.l"
+#line 251 "mipl.l"
 {
     printTokenInfo("T_COLON", yytext);
-    return 1;
+    return T_COLON;
 }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 255 "mipl.l"
+#line 256 "mipl.l"
 {
     printTokenInfo("T_LT", yytext);
-    return 1;
+    return T_LT;
 }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 260 "mipl.l"
+#line 261 "mipl.l"
 {
     printTokenInfo("T_GT", yytext);
-    return 1;
+    return T_GT;
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 265 "mipl.l"
+#line 266 "mipl.l"
 {
     printTokenInfo("T_NE", yytext);
-    return 1;
+    return T_NE;
 }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 270 "mipl.l"
+#line 271 "mipl.l"
 {
     printTokenInfo("T_LE", yytext);
-    return 1;
+    return T_LE;
 }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 275 "mipl.l"
+#line 276 "mipl.l"
 {
     printTokenInfo("T_GE", yytext);
-    return 1;
+    return T_GE;
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 280 "mipl.l"
+#line 281 "mipl.l"
 {
     printTokenInfo("T_EQ", yytext);
-    return 1;
+    return T_EQ;
 }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 285 "mipl.l"
+#line 286 "mipl.l"
 {
     printTokenInfo("T_DOT", yytext);
-    return 1;
+    return T_DOT;
 }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 290 "mipl.l"
+#line 291 "mipl.l"
 {
     printTokenInfo("T_DOTDOT", yytext);
-    return 1;
+    return T_DOTDOT;
 }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 295 "mipl.l"
+#line 296 "mipl.l"
 {
     printTokenInfo("T_IDENT", yytext);
-    return 1;
+    return T_IDENT;
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 300 "mipl.l"
+#line 301 "mipl.l"
 {
     printf("**** Invalid character constant: %s\n", yytext);
     return 1;
@@ -1260,7 +1290,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 305 "mipl.l"
+#line 306 "mipl.l"
 {
     printf("**** Invalid character constant: %s\n", yytext);
     return 1;
@@ -1268,7 +1298,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 310 "mipl.l"
+#line 311 "mipl.l"
 {
     printTokenInfo("T_UNKNOWN", yytext);
     return 1;
@@ -1276,10 +1306,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 315 "mipl.l"
+#line 316 "mipl.l"
 ECHO;
 	YY_BREAK
-#line 1283 "lex.yy.c"
+#line 1313 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1640,6 +1670,10 @@ static int yy_get_next_buffer (void)
 
 	*--yy_cp = (char) c;
 
+    if ( c == '\n' ){
+        --yylineno;
+    }
+
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
@@ -1714,6 +1748,11 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
+
+	if ( c == '\n' )
+		   
+    yylineno++;
+;
 
 	return c;
 }
@@ -2185,6 +2224,9 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
+    /* We do not touch yylineno unless the option is enabled. */
+    yylineno =  1;
+    
     (yy_buffer_stack) = 0;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2277,25 +2319,8 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 315 "mipl.l"
+#line 316 "mipl.l"
 
 
-
-// User-written code goes here
-
-void printTokenInfo(const char* tokenType, char* lexeme) {
-    printf("TOKEN: %s  LEXEME: %s\n", tokenType, lexeme);
-}
-
-// You should supply a yywrap function.
-// Having it return 1 means only 1 input file will be scanned.
-int yywrap(void) { return 1; }
-
-int main(void) {
-    while ( yylex() ) ;  // Keep processing tokens until 0 returned
-
-    //printf("Processed %d lines\n", numLines);
-    return 0;
-}
 
 
