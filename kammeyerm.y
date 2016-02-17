@@ -41,19 +41,24 @@ int lineNum = 1;                   // source line number
  vector< map<char*, char*> > tables;
  vector<char*> lstidents;
  struct typeinfo {
-  char* type;
-  char* startindex;
-  char* endindex;
-  char* basetype;
+   char* type;
+   char* startindex;
+   char* startsign;
+   char* endindex;
+   char* endsign;
+   char* basetype;
  };
  
  struct idents {
-  char* text;
+   char* sign;
+   char* text;
  };
  
  struct indexrange {
-  char* start;
-  char* end;
+   char* start;
+   char* startsign;
+   char* end;
+   char* endsign;
  };
 
  bool search_tables(char* ident) {
@@ -154,7 +159,9 @@ N_ADDOP         : T_PLUS {
    {
      $$.type = "ARRAY";
      $$.startindex = $3.start;
+     $$.startsign = $3.startsign;
      $$.endindex = $3.end;
+     $$.endsign = $3.endsign;
      $$.basetype = $6.type;
      prRule("N_ARRAY",
      "T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE");
@@ -262,13 +269,16 @@ N_ADDOP         : T_PLUS {
  N_IDX           : N_INTCONST
      {
        $$.text = $1.text;
+       $$.sign = $1.sign;
   prRule("N_IDX", "N_INTCONST");
  };
 
  N_IDXRANGE      : N_IDX T_DOTDOT N_IDX
    {
      $$.start = $1.text;
+     $$.startsign = $1.sign;
      $$.end = $3.text;
+     $$.endsign = $3.sign;
      prRule("N_IDXRANGE", "N_IDX T_DOTDOT N_IDX");
    };
 
@@ -293,9 +303,10 @@ N_ADDOP         : T_PLUS {
 
  N_INTCONST      : N_SIGN T_INTCONST
    {
-     $$.text = strcat($1.text, $2);
-  prRule("N_INTCONST", "N_SIGN T_INTCONST");
- };
+     $$.text = $2;
+     $$.sign = $1.text;
+     prRule("N_INTCONST", "N_SIGN T_INTCONST");
+   };
 
  N_MULTOP        : T_MULT
      {
@@ -393,7 +404,9 @@ N_ADDOP         : T_PLUS {
        else {
 	 yyerror("Multiply defined identifier");
        }
-     }N_BLOCK T_DOT{};
+     }N_BLOCK {
+       printf("\n___Exiting scope...\n\n");
+      } T_DOT{};
 
  N_PROGLBL       : T_PROG
      {
@@ -529,7 +542,9 @@ N_ADDOP         : T_PLUS {
                  { 
 		   $$.type = $1.type; 
 		   $$.startindex = $1.startindex;
+		   $$.startsign = $1.startsign;
 		   $$.endindex = $1.endindex;
+		   $$.endsign = $1.endsign;
 		   $$.basetype = $1.basetype;
 		   prRule("N_TYPE", "N_ARRAY");
 		 };
@@ -549,9 +564,9 @@ N_ADDOP         : T_PLUS {
        }
 
        else {
-	 printf("___Adding %s to symbol table with type %s %s .. %s of %s\n"
-		,$1.text ,$4.type, $4.startindex
-		, $4.endindex, $4.basetype);
+	 printf("___Adding %s to symbol table with type %s %s%s .. %s%s OF %s\n"
+		,$1.text ,$4.type, $4.startsign, $4.startindex
+		, $4.endsign, $4.endindex, $4.basetype);
        }
      }
        
@@ -571,9 +586,9 @@ N_ADDOP         : T_PLUS {
 	 }
 
 	 else {
-	   printf("___Adding %s to symbol table with type %s %s .. %s of %s\n"
-		  ,a ,$4.type, $4.startindex
-		  , $4.endindex, $4.basetype);
+	   printf("___Adding %s to symbol table with type %s %s%s .. %s%s OF %s\n"
+		  ,a ,$4.type, $4.startsign, $4.startindex
+		  , $4.endsign, $4.endindex, $4.basetype);
 	 }
        }
        

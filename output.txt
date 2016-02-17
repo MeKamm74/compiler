@@ -31,7 +31,7 @@ N_SIMPLE -> T_INT
 N_ARRAY -> T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE
 N_TYPE -> N_ARRAY
 N_VARDEC -> N_IDENT N_IDENTLST T_COLON N_TYPE
-___Adding stuff to symbol table with type ARRAY (null) .. (null) of INTEGER
+___Adding stuff to symbol table with type ARRAY 1 .. 20 OF INTEGER
 TOKEN: T_SCOLON         LEXEME: ;
 TOKEN: T_IDENT          LEXEME: data
 N_IDENT -> T_IDENT
@@ -204,8 +204,8 @@ N_SIMPLE -> T_BOOL
 N_ARRAY -> T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE
 N_TYPE -> N_ARRAY
 N_VARDEC -> N_IDENT N_IDENTLST T_COLON N_TYPE
-___Adding A to symbol table with type ARRAY (null) .. (null) of BOOLEAN
-___Adding B to symbol table with type ARRAY (null) .. (null) of BOOLEAN
+___Adding A to symbol table with type ARRAY 5 .. 1 OF BOOLEAN
+___Adding B to symbol table with type ARRAY 5 .. 1 OF BOOLEAN
 TOKEN: T_SCOLON         LEXEME: ;
 TOKEN: T_BEGIN          LEXEME: begin
 N_VARDECLST -> epsilon
@@ -1138,6 +1138,9 @@ N_STMTLST -> T_SCOLON N_STMT N_STMTLST
 N_COMPOUND -> T_BEGIN N_STMT N_STMTLST T_END
 N_STMTPART -> N_COMPOUND
 N_BLOCK -> N_VARDECPART N_PROCDECPART N_STMTPART
+
+___Exiting scope...
+
 TOKEN: T_DOT            LEXEME: .
 N_START -> N_PROG
 
